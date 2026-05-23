@@ -1,0 +1,2 @@
+# Globaalsete-kosmosestartide-ja-ilmastikutingimuste-analuus
+Globaalsete kosmosestartide ja ilmastikutingimuste analüüs
