@@ -1,12 +1,16 @@
-# Äriküsimus
+# Kosmosestartide ja ilmastikutingimuste analüüs
+
+## Äriküsimus
 
 Millised ettevõtted planeerivad lähiajal enim kosmosestarte ja kui suur on ilmastikust tulenev edasilükkamise risk stardiplatvormi asukohas?
+
+Projekt aitab visualiseerida kosmosestartide aktiivsust ning hinnata võimalikke ilmastikuga seotud riske enne starti.
 
 ---
 
 # Mõõdikud
 
-## 1. Startide arv ettevõtte kohta
+## 1. Planeeritud startide arv ettevõtte kohta
 Loendatakse mitu planeeritud starti on igal ettevõttel järgmise 30 päeva jooksul.
 
 ## 2. Ilmastikurisk stardiplatvormis
@@ -20,34 +24,13 @@ Loendatakse millistes asukohtades toimub enim starte.
 
 ---
 
-# Andmeallikad
-
-## The Space Devs Launch Library API
-https://lldev.thespacedevs.com/2.2.0/launch/upcoming/
-
-Sisaldab:
-- stardi aeg
-- ettevõte
-- stardiplatvorm
-- koordinaadid
-
-Andmed uuenevad regulaarselt.
-
-## Open-Meteo API
-https://api.open-meteo.com
-
-Kasutatakse ilmastikuandmete saamiseks stardiplatvormi koordinaatide põhjal.
-
-Andmed uuenevad tunnipõhiselt.
-
----
-
-# Andmevoog
+# Arhitektuur
 
 ```mermaid
 flowchart LR
 
 A[Launch Library API] --> B[Python ETL]
+
 C[Open Meteo API] --> B
 
 B --> D[(PostgreSQL)]
@@ -57,55 +40,120 @@ D --> E[Power BI / Superset]
 
 ---
 
-# Andmebaasi kihid
+# Andmestik
 
-## Raw layer
-Salvestatakse API vastused muutmata kujul.
-
-## Clean layer
-Puhastatud ja ühendatud andmed.
-
-## Analytics layer
-Agregeeritud mõõdikud dashboardi jaoks.
+| Allikas | Tüüp | Ajas muutuv? | Roll |
+|---|---|---|---|
+| The Space Devs Launch Library API | API | Jah, regulaarselt | Põhiandmed kosmosestartide kohta |
+| Open-Meteo API | API | Jah, tunnipõhiselt | Ilmaandmed stardiplatvormidele |
 
 ---
 
-# Tööjaotus
+# Stack
 
-Projekt tehakse individuaalselt.
-
-Rollid:
-- Andmeallikad ja API päringud
-- Andmete töötlemine
-- Andmebaasi haldus
-- Visualiseerimine
-- Dokumentatsioon
-
----
-
-# Riskid
-
-## 1. API limiidid või katkestused
-Maandamine:
-- cache
-- lokaalsed testfailid
-
-## 2. Ilmaennustuse muutumine kiiresti
-Maandamine:
-- salvestatakse päringu aeg
-- kasutatakse viimast prognoosi
-
-## 3. Koordinaadid võivad puududa
-Maandamine:
-- filtreeritakse puudulikud kirjed välja
+| Komponent | Tööriist |
+|---|---|
+| Sissevõtt | Python |
+| Transformatsioon | SQL |
+| Andmehoidla | PostgreSQL |
+| Näidikulaud | Power BI |
+| Orkestreerimine | Planeeritud järgmistes sprintides |
 
 ---
 
-# Privaatsus ja turve
+# Käivitamine
 
-Projekt kasutab ainult avalikke andmeid.
+```bash
+# Repo kloonimine
+git clone <repo-url>
 
-API võtmeid ei kasutata.
-Kui tulevikus lisanduvad võtmed:
+# Liikumine projekti kausta
+cd globaalsete-kosmosestartide-ja-ilmastikutingimuste-analuus
+```
+
+Sprint 1 jooksul tehakse esimesed API testid ja arhitektuuri valideerimine.
+
+---
+
+# Saladused ja konfiguratsioon
+
+Projekt kasutab avalikke API-sid ning autentimist hetkel vaja ei ole.
+
+Kui hiljem lisatakse API võtmeid:
 - kasutatakse `.env` faili
 - `.env` lisatakse `.gitignore` faili
+- repos hoitakse ainult `.env.example` faili
+
+---
+
+# Andmevoog lühidalt
+
+## Sissevõtt
+Python skript pärib kosmosestartide andmed Launch Library API-st ning ilmaandmed Open-Meteo API-st.
+
+## Laadimine
+Andmed laaditakse PostgreSQL staging kihti.
+
+## Transformatsioon
+Andmed ühendatakse stardiplatvormi koordinaatide alusel ning arvutatakse ilmastikuriskid.
+
+## Näidikulaud
+Dashboard kuvab:
+- startide arvu ettevõtte kohta
+- aktiivseimad stardiplatvormid
+- ilmastikuriskid
+
+---
+
+# Andmekvaliteedi testid
+
+Projekt kontrollib:
+- stardi ID unikaalsust
+- puuduvate koordinaatide olemasolu
+- kuupäevade korrektsust
+
+---
+
+# Projekti struktuur
+
+```text
+.
+├── README.md
+├── docs/
+│   └── arhitektuur.md
+├── scripts/
+│   └── test_api.py
+└── data/
+```
+
+---
+
+# Kokkuvõte, puudused ja edasiarendused
+
+## Kokkuvõte
+Sprint 1 jooksul:
+- valiti äriküsimus
+- kaardistati API-d
+- loodi arhitektuur
+- testiti API ligipääsud
+
+## Puudused
+- andmebaasi automaatne laadimine pole veel realiseeritud
+- dashboard pole veel loodud
+
+## Mis edasi
+- automaatne ETL töövoog
+- PostgreSQL integratsioon
+- visualiseerimine Power BI-s
+- ilmastikuriski täpsem arvutamine
+
+---
+
+# Meeskond
+
+| Nimi | Roll |
+|---|---|
+| [Liige 1] | 
+| [Liige 2] | 
+| [Liige 3] |
+| [Liige 4] | 
