@@ -46,10 +46,29 @@ Täpsem kirjeldus: `docs/arhitektuur.md`
 ## Käivitamine
 
 ```bash
+# 1. Klooni repo
+git clone <repo-url>
+
+# 2. Liigu projekti kausta
+cd Globaalsete-kosmosestartide-ja-ilmastikutingimuste-analuus
+
+# 3. Kopeeri konfiguratsioon
+cp .env.example .env
+
+# 4. Käivita andmevoog
+
 python scripts/load_launches.py
+
 python scripts/transform_launches.py
+
 python scripts/create_chart.py
 ```
+
+Tulemusena tekivad järgmised failid:
+
+* `data/raw/upcoming_launches.json`
+* `data/processed/company_launch_counts.csv`
+* `output/top_companies.png`
 
 ## Saladused ja konfiguratsioon
 
@@ -78,6 +97,8 @@ Projekt kontrollib:
 ```text
 .
 ├── README.md
+├── .env.example
+├── .gitignore
 ├── docs/
 │   ├── arhitektuur.md
 │   └── progress.md
