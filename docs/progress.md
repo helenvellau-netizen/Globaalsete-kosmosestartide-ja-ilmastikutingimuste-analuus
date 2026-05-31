@@ -1,32 +1,49 @@
-# Sprint 2 edenemine
+# Edenemisraport
 
 ## Mis on valmis
 
-* Launch Library API ühendus on testitud ja töötab.
-* Loodud sissevõtu skript `load_launches.py`, mis salvestab API andmed JSON kujul.
-* Loodud transformatsiooni skript `transform_launches.py`, mis arvutab ettevõtete planeeritud startide arvu.
-* Loodud visualiseerimine `create_chart.py`, mis kuvab ettevõtete planeeritud startide arvu graafikuna.
-* Andmevoog töötab otsast lõpuni (API → JSON → CSV → graafik).
+* [ ] Docker Compose käivitab kõik teenused
+* [x] Andmeid saadakse allikast kätte
+* [ ] Andmed laetakse `staging` kihti
+* [x] Vähemalt üks transformatsioon toimib
+* [x] Vähemalt üks näidikulaud on nähtaval
+* [ ] Vähemalt üks andmekvaliteedi test läbib
+
+Täpsustus:
+
+* Launch Library API ühendus töötab.
+* Andmed salvestatakse JSON kujul faili `data/raw/upcoming_launches.json`.
+* Transformatsioon arvutab ettevõtete planeeritud startide arvu ja salvestab tulemuse faili `data/processed/company_launch_counts.csv`.
+* Loodud on esimene visualiseerimine `output/top_companies.png`.
 
 ## Järgmised sammud
 
 * Lisada Open-Meteo API andmed.
 * Salvestada andmed PostgreSQL andmebaasi.
-* Täiendada visualiseerimisi ilmastikuriski analüüsiga.
-* Luua täiendavad mõõdikud ja filtrid.
+* Lisada andmekvaliteedi testid.
+* Luua täiendavad visualiseerimised.
 
 ## Mis takistab
 
-Hetkel puuduvad blokeerivad probleemid.
+* Praegu puuduvad blokeerivad probleemid.
+* Open-Meteo API integreerimine on planeeritud järgmisse sprinti.
 
 ## Kontrollpunkt
 
-Töötav andmevoog:
+Käsk, millega saab kontrollida, et töövoog töötab:
 
-Launch Library API → upcoming_launches.json → company_launch_counts.csv → top_companies.png
+```bash
+python scripts/load_launches.py
+python scripts/transform_launches.py
+python scripts/create_chart.py
+```
 
-Kontrollitavad failid:
+Oodatav tulemus:
 
-* `data/raw/upcoming_launches.json`
-* `data/processed/company_launch_counts.csv`
-* `output/top_companies.png`
+* Tekib fail `data/raw/upcoming_launches.json`
+* Tekib fail `data/processed/company_launch_counts.csv`
+* Tekib fail `output/top_companies.png`
+* Graafik kuvab ettevõtted planeeritud startide arvu järgi
+
+```
+```
