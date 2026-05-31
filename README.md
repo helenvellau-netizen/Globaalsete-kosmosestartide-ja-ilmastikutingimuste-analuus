@@ -10,7 +10,7 @@ Projekt aitab analüüsida planeeritud kosmosestarte ning hinnata ilmastikutingi
 
 1. Planeeritud startide arv ettevõtte kohta järgmise 30 päeva jooksul. HELENI kommentaar: visuaal 1 - horisontaalne tulpdiagramm kus on TOP 5 ettevõtte nimed ja planeeritavate startide arv
 2. Kõige aktiivsemad stardiplatvormid planeeritud startide arvu järgi. HELENI kommentaar: visuaal 2 - horisontaalne tulpdiagramm kus on TOP 5 asukoha nimed ja planeeritavate startide arv (tulba võime värvida vastavalt TOP5 ettevõtete värvidele, tekib stacked bar chart)
-3. Ilmastikurisk stardiplatvormi asukohas. HELENI kommentaar: visuaal 3 - heatmap VÕI "seier" VÕI tulpdiagramm
+3. Ilmastikurisk stardiplatvormi asukohas. HELENI kommentaar: kolm komponenti - tuul, sademed, nähtavus - kui nendest miski läheb üle lubatud piiri siis on stardi edasilükkamise risk. visuaalil peaks olema ilmselt igal komponendil oma seier
 
 HELENI kommentaar: dashboardi hea näide https://www.slideteam.net/cyber-risk-impact-and-likelihood-analysis-dashboard.html
 
