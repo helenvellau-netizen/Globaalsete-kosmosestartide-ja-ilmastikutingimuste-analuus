@@ -44,7 +44,7 @@ D --> E[Power BI / Superset]
 
 | Allikas | Tüüp | Ajas muutuv? | Roll |
 |---|---|---|---|
-| The Space Devs Launch Library API | API | Jah, regulaarselt | Põhiandmed kosmosestartide kohta | 
+| The Space Devs Launch Library API | API | Jah, mitu korda päevas | Põhiandmed kosmosestartide kohta |
 | Open-Meteo API | API | Jah, tunnipõhiselt | Ilmaandmed stardiplatvormidele |
 
 /HELENI KOMMENTAAR - kui sageli on "regulaarselt"?/
@@ -106,6 +106,26 @@ Dashboard kuvab:
 
 ---
 
+
+# Tehnilised katsetused
+
+## Launch Library API test
+
+Testiti ühendust The Space Devs Launch Library API-ga.
+
+Kuupäev: 25.05.2025
+
+Tulemus:
+- HTTP vastuskood: 200
+- API vastas korrektselt
+- Kosmosestartide andmed saadi edukalt kätte
+
+Näidistulemus:
+Falcon 9 Block 5 | Starlink Group 17-41
+
+---
+
+
 # Andmekvaliteedi testid
 
 Projekt kontrollib:
@@ -154,7 +174,5 @@ Sprint 1 jooksul:
 
 | Nimi | Roll |
 |---|---|
-| [Liige 1] | 
-| [Liige 2] | 
-| [Liige 3] |
-| [Liige 4] | 
+| [Katrin Laur] | 
+| [Helen Vellau] | 
