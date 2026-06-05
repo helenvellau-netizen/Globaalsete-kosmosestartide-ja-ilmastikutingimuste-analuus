@@ -49,14 +49,16 @@ Täpsem kirjeldus: `docs/arhitektuur.md`
 
 ## Andmevoog lühidalt
 1.Launch Library API-st laaditakse järgmise 30 päeva planeeritud kosmosestardid.
+
 2.Andmed salvestatakse PostgreSQL staging kihti (staging.launches_raw).
+
 3.Transformatsioonide käigus arvutatakse:
  * ettevõtete planeeritud startide arv;
  * stardiplatvormide planeeritud startide arv.
+   
 4.Käivitatakse andmekvaliteedi testid.
+
 5.Tulemused kuvatakse Apache Superset dashboardil.
-
-
 
 
 ## Käivitamine
