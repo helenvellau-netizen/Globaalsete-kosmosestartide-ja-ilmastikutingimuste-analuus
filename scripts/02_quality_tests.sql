@@ -13,3 +13,13 @@ HAVING COUNT(*) > 1;
 SELECT COUNT(*) AS missing_provider
 FROM staging.launches_raw
 WHERE provider_name IS NULL;
+
+-- Test 4: launch_count peab olema positiivne
+SELECT *
+FROM mart.company_launches
+WHERE launch_count <= 0;
+
+-- Test 5: location launch_count peab olema positiivne
+SELECT *
+FROM mart.launches_by_location
+WHERE launch_count <= 0;
