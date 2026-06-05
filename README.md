@@ -19,12 +19,11 @@ NASA tingimused ilmadele et saaks startida https://www3.nasa.gov/centers/kennedy
 
 ```mermaid
 flowchart LR
-    A[Launch Library API] --> B[Python sissevõtt]
-    C[Open-Meteo API] --> B
-    B --> D[(staging/raw)]
-    D --> E[Transformatsioon]
-    E --> F[(mart/analytics)]
-    F --> G[Näidikulaud]
+    A[Launch Library API] --> B[Python sissevõtt] 
+    C[Open-Meteo API] --> B 
+    B --> D[(staging)] 
+    D --> E[(mart)] 
+    E --> F[Apache Superset]
 ```
 
 Täpsem kirjeldus: `docs/arhitektuur.md`
@@ -33,67 +32,82 @@ Täpsem kirjeldus: `docs/arhitektuur.md`
 
 | Allikas                           | Tüüp | Ajas muutuv?           | Roll                           |
 | --------------------------------- | ---- | ---------------------- | ------------------------------ |
-| The Space Devs Launch Library API | API  | Jah, mitu korda päevas | Kosmosestartide andmed         |
-| Open-Meteo API                    | API  | Jah, tunnipõhiselt     | Ilmaandmed stardiplatvormidele |
+| The Space Devs Launch Library API | API  | Jah, mitu korda päevas | Planeeritud kosmosestardid        |
+| Open-Meteo API                    | API  | Jah, tunnipõhiselt     | Stardiplatvormide ilmaandmed |
 
 ## Stack
 
 | Komponent        | Tööriist                                        |
 | ---------------- | ----------------------------------------------- |
 | Sissevõtt        | Python                                          |
-| Transformatsioon | Python                                          |
-| Andmehoidla      | JSON / CSV (Sprint 2), PostgreSQL (planeeritud) |
-| Näidikulaud      | Power BI või Apache Superset                    |
+| Transformatsioon | Python + SQL                                    |
+| Andmehoidla      | PostgreSQL (pgDuckDB)                           |
+| Näidikulaud      | Apache Superset                                 |
 | Orkestreerimine  | Käsitsi käivitatavad skriptid                   |
+| Konteinerid      | Docker Compose                                  |
+
+
+## Andmevoog lühidalt
+1.Launch Library API-st laaditakse järgmise 30 päeva planeeritud kosmosestardid.
+2.Andmed salvestatakse PostgreSQL staging kihti (staging.launches_raw).
+3.Transformatsioonide käigus arvutatakse:
+ * ettevõtete planeeritud startide arv;
+ * stardiplatvormide planeeritud startide arv.
+4.Käivitatakse andmekvaliteedi testid.
+5.Tulemused kuvatakse Apache Superset dashboardil.
+
+
+
 
 ## Käivitamine
 
 ```bash
-# 1. Klooni repo
-git clone <repo-url>
-
-# 2. Liigu projekti kausta
-cd Globaalsete-kosmosestartide-ja-ilmastikutingimuste-analuus
-
-# 3. Kopeeri konfiguratsioon
+# 1. Kopeeri keskkonnamuutujad
 cp .env.example .env
 
-# 4. Käivita andmevoog
+# 2. Käivita PostgreSQL 
+docker compose up -d
 
+# 3. Kontrolli, et andmebaas töötab
+docker compose ps
+
+# 4. Paigalda Pythoni sõltuvused
+pip install -r requirements.txt
+
+# 5. Käivita andmevoog
 python scripts/load_launches.py
 
-python scripts/transform_launches.py
+# 6. Salvesta PostgreSQL-i 
+python scripts/load_to_postgres.py
 
+# 7. Käivita SQL transformatsioonid
+cat scripts/01_transform.sql | docker compose exec -T db psql -U praktikum -d kosmos
+cat scripts/03_location_transform.sql | docker compose exec -T db psql -U praktikum -d kosmos
+
+# 8. Käivita andmekvaliteedi testid
+cat scripts/02_quality_tests.sql | docker compose exec -T db psql -U praktikum -d kosmos
+
+# 9. Loo visualiseerimine
 python scripts/create_chart.py
 ```
 
-Tulemusena tekivad järgmised failid:
-
-* `data/raw/upcoming_launches.json`
-* `data/processed/company_launch_counts.csv`
-* `output/top_companies.png`
-
 ## Saladused ja konfiguratsioon
 
-Projekt kasutab avalikke API-sid.
+Projekt kasutab .env faili keskkonnamuutujate hoidmiseks.
 
-Konfiguratsioon hoitakse failis `.env`, mille näidis asub failis `.env.example`.
+Reposse lisatakse ainult .env.example.
 
-## Andmevoog lühidalt
-
-1. Sissevõtt – Launch Library API-st laaditakse kosmosestartide andmed.
-2. Laadimine – andmed salvestatakse JSON-failina kausta `data/raw`.
-3. Transformatsioon – arvutatakse ettevõtete planeeritud startide arv.
-4. Visualiseerimine – luuakse graafik kõige aktiivsematest ettevõtetest.
-5. Tulemus – graafik salvestatakse kausta `output`.
+Päris .env fail on lisatud .gitignore faili ning ei jõua GitHubi.
 
 ## Andmekvaliteedi testid
 
-Projekt kontrollib:
-
-1. Stardi ID unikaalsust.
-2. Puuduvate koordinaatide olemasolu.
-3. Kuupäevade korrektsust.
+Staging
+launch_id ei tohi olla tühi (NOT NULL).
+launch_id peab olema unikaalne.
+provider_name ei tohi olla tühi.
+Mart
+company_launches.launch_count peab olema positiivne.
+launches_by_location.launch_count peab olema positiivne.
 
 ## Projekti struktuur
 
@@ -102,47 +116,55 @@ Projekt kontrollib:
 ├── README.md
 ├── .env.example
 ├── .gitignore
+├── compose.yml
 ├── docs/
-│   ├── arhitektuur.md
-│   └── progress.md
+│ ├── arhitektuur.md
+│ └── progress.md
 ├── scripts/
-│   ├── test_api.py
-│   ├── load_launches.py
-│   ├── transform_launches.py
-│   └── create_chart.py
+│ ├── load_launches.py
+│ ├── load_to_postgres.py
+│ ├── test_api.py
+│ ├── test_postgres.py
+│ ├── 01_transform.sql
+│ ├── 02_quality_tests.sql
+│ ├── 03_location_transform.sql
+│ └── create_chart.py
 ├── data/
-│   ├── raw/
-│   └── processed/
+│ ├── raw/
+│ └── processed/
 └── output/
+
 ```
 
 ## Kokkuvõte, puudused ja edasiarendused
 
 ### Kokkuvõte
 
-* API ühendus töötab.
-* Andmevoog API → JSON → CSV → graafik on realiseeritud.
-* Loodud esimene visualiseerimine.
+* Launch Library API ühendus töötab.
+* PostgreSQL staging ja mart kihid on realiseeritud.
+* Loodud on ettevõtete ja stardiplatvormide analüütikatabelid.
+* Rakendatud on andmekvaliteedi testid.
+* Docker Compose võimaldab andmebaasi kiiresti käivitada.
 
 ### Puudused
 
-* Open-Meteo API pole veel integreeritud.
-* PostgreSQL andmebaasi ei kasutata veel.
-* Dashboard on alles planeerimisel.
+* Open-Meteo API integratsioon on pooleli.
+* Ilmastikuriski skoor vajab täiendavat valideerimist.
+* Dashboard on arendusjärgus.
 
 ### Mis edasi
 
-* Lisada ilmaandmed.
-* Salvestada andmed PostgreSQL-i.
-* Luua Power BI või Apache Supersetiga dashboard.
-* Lisada automaatne andmete uuendamine.
+* Lisada Open-Meteo andmed PostgreSQL-i.
+* Arvutada automaatselt ilmastikuriski skoor.
+* Luua Apache Superset dashboard.
+* Automatiseerida andmete uuendamine ajastatud töövooga.
 
 ## Meeskond
 
 | Nimi         | Roll                               |
 | ------------ | ---------------------------------- |
-| Katrin Laur  |  |
-| Helen Vellau |  |
+| Katrin Laur  | Andmevoog, PostgreSQL, transformatsioonid |
+| Helen Vellau | Dashboard, visualiseerimine, dokumentatsioon |
 
 ```
 ```
