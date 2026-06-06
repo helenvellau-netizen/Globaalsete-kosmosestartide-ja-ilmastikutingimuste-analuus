@@ -10,7 +10,7 @@ Projekt aitab analüüsida planeeritud kosmosestarte ning hinnata ilmastikutingi
 
 1. Planeeritud startide arv ettevõtte kohta järgmise 30 päeva jooksul. HELENI kommentaar: visuaal 1 - horisontaalne tulpdiagramm kus on TOP 5 ettevõtte nimed ja planeeritavate startide arv
 2. Kõige aktiivsemad stardiplatvormid planeeritud startide arvu järgi. HELENI kommentaar: visuaal 2 - horisontaalne tulpdiagramm kus on TOP 5 asukoha nimed ja planeeritavate startide arv (tulba võime värvida vastavalt TOP5 ettevõtete värvidele, tekib stacked bar chart)
-3. Ilmastikurisk stardiplatvormi asukohas. HELENI kommentaar: kolm komponenti - tuul, sademed, nähtavus - kui nendest miski läheb üle lubatud piiri siis on stardi edasilükkamise risk. visuaalil peaks olema ilmselt igal komponendil oma seier
+3. Riskiskoor arvutatakse tuulekiiruse, sademete ja nähtavuse põhjal.
 
 HELENI kommentaar: dashboardi hea näide https://www.slideteam.net/cyber-risk-impact-and-likelihood-analysis-dashboard.html
 NASA tingimused ilmadele et saaks startida https://www3.nasa.gov/centers/kennedy/pdf/167476main_Weather-07R.pdf
@@ -48,17 +48,23 @@ Täpsem kirjeldus: `docs/arhitektuur.md`
 
 
 ## Andmevoog lühidalt
-1.Launch Library API-st laaditakse järgmise 30 päeva planeeritud kosmosestardid.
 
-2.Andmed salvestatakse PostgreSQL staging kihti (staging.launches_raw).
+1. Launch Library API-st laaditakse järgmise 30 päeva planeeritud kosmosestardid.
 
-3.Transformatsioonide käigus arvutatakse:
- * ettevõtete planeeritud startide arv;
- * stardiplatvormide planeeritud startide arv.
-   
-4.Käivitatakse andmekvaliteedi testid.
+2. Open-Meteo API-st laaditakse stardiplatvormide ilmaandmed.
 
-5.Tulemused kuvatakse Apache Superset dashboardil.
+3. Andmed salvestatakse PostgreSQL staging kihti:
+   * staging.launches_raw
+   * staging.weather_raw
+
+4. Transformatsioonide käigus arvutatakse:
+   * ettevõtete planeeritud startide arv;
+   * stardiplatvormide planeeritud startide arv;
+   * ilmastikuriski skoor ja riskitase.
+
+5. Käivitatakse andmekvaliteedi testid.
+
+6. Tulemused kuvatakse Apache Superset dashboardil.
 
 
 ## Käivitamine
@@ -150,16 +156,15 @@ launches_by_location.launch_count peab olema positiivne.
 
 ### Puudused
 
-* Open-Meteo API integratsioon on pooleli.
 * Ilmastikuriski skoor vajab täiendavat valideerimist.
-* Dashboard on arendusjärgus.
+* Riskiskoori mudelit võiks valideerida ajalooliste andmetega.
 
 ### Mis edasi
 
-* Lisada Open-Meteo andmed PostgreSQL-i.
-* Arvutada automaatselt ilmastikuriski skoor.
-* Luua Apache Superset dashboard.
-* Automatiseerida andmete uuendamine ajastatud töövooga.
+* Täiustada ilmastikuriski mudelit stardiplatvormi-spetsiifiliste piirväärtustega.
+* Lisada ajalooliste ilmaandmete analüüs.
+* Automatiseerida töövoog Airflow abil.
+* Täiendada Apache Superseti dashboardi täiendavate KPI-dega.
 
 ## Meeskond
 
