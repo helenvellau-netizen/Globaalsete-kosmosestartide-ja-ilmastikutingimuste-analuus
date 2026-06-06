@@ -36,7 +36,7 @@ for loc in locations:
         "forecast_days": 1,
     }
 
-    response = requests.get(url, params=params, timeout=30)
+    response = requests.get(url, params=params, timeout=90)
     response.raise_for_status()
     data = response.json()
 

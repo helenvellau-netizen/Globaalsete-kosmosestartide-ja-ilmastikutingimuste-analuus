@@ -14,12 +14,23 @@ SELECT COUNT(*) AS missing_provider
 FROM staging.launches_raw
 WHERE provider_name IS NULL;
 
--- Test 4: launch_count peab olema positiivne
+-- Test 4
 SELECT *
 FROM mart.company_launches
 WHERE launch_count <= 0;
 
--- Test 5: location launch_count peab olema positiivne
+-- Test 5
 SELECT *
 FROM mart.launches_by_location
 WHERE launch_count <= 0;
+
+-- Test 6
+SELECT COUNT(*) AS missing_wind_speed
+FROM staging.weather_raw
+WHERE wind_speed_ms IS NULL;
+
+-- Test 7
+SELECT *
+FROM mart.weather_risk
+WHERE weather_risk_score < 0
+   OR weather_risk_score > 100;
