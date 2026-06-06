@@ -49,18 +49,18 @@ Täpsem kirjeldus: `docs/arhitektuur.md`
 
 ## Andmevoog lühidalt
 
+## Andmevoog lühidalt
+
 1. Launch Library API-st laaditakse järgmise 30 päeva planeeritud kosmosestardid.
 
-2. Open-Meteo API-st laaditakse stardiplatvormide ilmaandmed.
+2. Andmed salvestatakse PostgreSQL staging kihti (`staging.launches_raw`).
 
-3. Andmed salvestatakse PostgreSQL staging kihti:
-   * staging.launches_raw
-   * staging.weather_raw
+3. Open-Meteo API-st laaditakse stardiplatvormide ilmaandmed ning salvestatakse tabelisse (`staging.weather_raw`).
 
-4. Transformatsioonide käigus arvutatakse:
-   * ettevõtete planeeritud startide arv;
-   * stardiplatvormide planeeritud startide arv;
-   * ilmastikuriski skoor ja riskitase.
+4. Transformatsioonide käigus luuakse:
+   * `mart.company_launches`
+   * `mart.launches_by_location`
+   * `mart.weather_risk`
 
 5. Käivitatakse andmekvaliteedi testid.
 
@@ -120,9 +120,11 @@ Staging
 launch_id ei tohi olla tühi (NOT NULL).
 launch_id peab olema unikaalne.
 provider_name ei tohi olla tühi.
+wind_speed_ms` ei tohi olla NULL.
 Mart
 company_launches.launch_count peab olema positiivne.
 launches_by_location.launch_count peab olema positiivne.
+weather_risk_score` peab jääma vahemikku 0–100.
 
 ## Projekti struktuur
 
@@ -138,6 +140,8 @@ launches_by_location.launch_count peab olema positiivne.
 ├── scripts/
 │ ├── load_launches.py
 │ ├── load_to_postgres.py
+│ ├── load_weather.py
+│ ├── transform_launches.py
 │ ├── test_api.py
 │ ├── test_postgres.py
 │ ├── 01_transform.sql
@@ -148,6 +152,7 @@ launches_by_location.launch_count peab olema positiivne.
 │ ├── raw/
 │ └── processed/
 └── output/
+├── requirements.txt
 
 ```
 
