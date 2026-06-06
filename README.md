@@ -82,20 +82,27 @@ docker compose ps
 # 4. Paigalda Pythoni sõltuvused
 pip install -r requirements.txt
 
-# 5. Käivita andmevoog
+# 5. Laadi kosmosestardid
 python scripts/load_launches.py
 
-# 6. Salvesta PostgreSQL-i 
+# 6. Salvesta kosmosestardid PostgreSQL staging kihti
 python scripts/load_to_postgres.py
 
-# 7. Käivita SQL transformatsioonid
+# 7. Laadi Open-Meteo ilmaandmed PostgreSQL staging kihti
+python scripts/load_weather.py
+
+# 8. Käivita transformatsioonid
 cat scripts/01_transform.sql | docker compose exec -T db psql -U praktikum -d kosmos
 cat scripts/03_location_transform.sql | docker compose exec -T db psql -U praktikum -d kosmos
+cat scripts/04_weather_risk.sql | docker compose exec -T db psql -U praktikum -d kosmos
 
-# 8. Käivita andmekvaliteedi testid
+# 9. Käivita andmekvaliteedi testid
 cat scripts/02_quality_tests.sql | docker compose exec -T db psql -U praktikum -d kosmos
 
-# 9. Loo visualiseerimine
+# 10. Kontrolli loodud mart tabeleid
+docker compose exec db psql -U praktikum -d kosmos -c "\dt mart.*"
+
+# 11. Loo visualiseerimine
 python scripts/create_chart.py
 ```
 
